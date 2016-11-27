@@ -1,62 +1,62 @@
 import sys
 import numpy as np
 
-TUPLE_FAIL = 100
-TUPLE_SUCCESS = 101
+
+def extract_x_and_y_from_file(examples_file_path):
+    """
+    :param examples_file_path: A string containing the path to the examples/training set file.
+    :return: Array of instances (which are also an array of literals) and an array of tags.
+    """
+    training_set = np.loadtxt(examples_file_path)
+
+    return [line[:-1] for line in training_set], [line[-1] for line in training_set]
 
 
-def parseFile(filePath):
-    x, y = [], []
-    training_examples = np.loadtxt(filePath)
-
-    for line in training_examples:
-        x.append(line[:-1])
-        y.append(line[-1:])
-
-    return x, y
-
-
-# h is two dimentional array with two cells in each row.
-# the number of rows is the number of variabels (x1,x2,x3,..)
-# the first column is flag for xi and the second column is flag for not(xi)
-# if the flag is 1 - the variable exist, of 0 - its not exist
-def calcTupleOnHypothesis(tuple, h):
-    for i, item in enumerate(tuple):
-        if ((h[i][0] == 1 and item == 0) or
-                (h[i][1] == 1 and item == 1)):
-            return TUPLE_FAIL
-    return TUPLE_SUCCESS
+def hypothesis_wrong(h, instance_representation):
+    """
+    The hypothesis is wrong if a given instance whose y is 1 is not a subset of the hypothesis.
+    :param h: array of tuples of literals index and condition (true/false)
+    :param instance_representation:
+    :return:
+    """
+    return not h.issubset(instance_representation)
 
 
-def algorithm(x, y):
-    h = []
-    for i in range(len(x[0])):
+def instance_representation(instance):
+    return set(zip(range(len(instance)), instance))
 
-        h.append([1, 1])
 
-    for index, tuple in enumerate(x):
-        if (y[index] == 1 and calcTupleOnHypothesis(tuple, h) == TUPLE_FAIL):
-            for index, item in enumerate(tuple):
-                if item == 1:
-                    h[index][1] = 0
-                else:
-                    h[index][0] = 0
+def algorithm2(x, y):
+    instance_length = len(x[0])
+    h = create_all_wrong_hypothesis(instance_length)
+
+    for example_index, instance in enumerate(x):
+        if y[example_index] == 1:
+            representation = instance_representation(instance)
+            if hypothesis_wrong(h, representation):
+                h = representation.intersection(h)
+
     return h
 
 
+def create_all_wrong_hypothesis(size):
+    return set(zip(2 * range(size), [0, 1, 1, 0] * size))
+
+
+def pretty_print_hypothesis(h):
+    for item in sorted(h, key=lambda x: x[0]):
+        if item[1] == 1:
+            outputFile.write("x" + str(item[0] + 1) + ",")
+        elif item[1] == 0:
+            outputFile.write("not(x" + str(item[0] + 1) + "),")
+
+
 if __name__ == '__main__':
-    # filePath = "D:\Code\MachineLearning\ex1\example1.txt"
-    # outputFilePath = "D:\Code\MachineLearning\ex1\output.txt"
-    filePath = sys.argv[1]
-    # outputFilePath = sys.argv[2]
-    outputFilePath = "./output.txt"
-    x, y = parseFile(filePath)
-    h = algorithm(x, y)
+    # inputFilePath = "D:\Projects\MachineLearningEx1\example1.txt"
+    inputFilePath = sys.argv[1]
+    outputFilePath = "./output1.txt"
 
     outputFile = open(outputFilePath, "w+")
 
-    for index, item in enumerate(h):
-        if item[0] == 1:
-            outputFile.write("x" + str(index + 1) + ",")
-        elif item[1] == 1:
-            outputFile.write("not(x" + str(index + 1) + "),")
+    x, y = extract_x_and_y_from_file(inputFilePath)
+    pretty_print_hypothesis(algorithm2(x, y))
