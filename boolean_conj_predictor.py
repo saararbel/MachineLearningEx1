@@ -23,6 +23,10 @@ def hypothesis_wrong(h, instance_representation):
 
 
 def instance_representation(instance):
+    """
+    :param instance: an array of literal's condition (1 for true, 0 for false)
+    :return: a set of tuples of literal index and condition
+    """
     return set(zip(range(len(instance)), instance))
 
 
@@ -40,7 +44,12 @@ def algorithm2(x, y):
 
 
 def create_all_wrong_hypothesis(size):
-    return set(zip(2 * range(size), [0, 1, 1, 0] * size))
+    """
+    create an all wrong hypothesis where each literal is existing both in it's form and negative form
+    :param size:
+    :return:
+    """
+    return set(zip(sorted(2 * range(size)), [0, 1] * size))
 
 
 def pretty_print_hypothesis(h):
@@ -52,9 +61,9 @@ def pretty_print_hypothesis(h):
 
 
 if __name__ == '__main__':
-    # inputFilePath = "D:\Projects\MachineLearningEx1\example1.txt"
+    # inputFilePath = "D:\Projects\MachineLearningEx1\example2.txt"
     inputFilePath = sys.argv[1]
-    outputFilePath = "./output1.txt"
+    outputFilePath = "./output.txt"
 
     outputFile = open(outputFilePath, "w+")
 

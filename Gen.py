@@ -3,10 +3,9 @@ import numpy as np
 import random
 
 """ parameters to change """
-#expected output: not(x1),x2,not(x4),x5
-lits = [1,2,3,1,2,3] #2:pos 1:neg 3:none 
-rounds = 100
-
+#expected output: x1,x5,not(x6),not(x7),not(x8),x9
+lits = [2,3,3,3,2,1,1,1,2,3,3,3] #2:pos 1:neg 3:none
+rounds = 200
 
 train = []
 for i in range(rounds):
@@ -20,4 +19,4 @@ for i in range(rounds):
     line.append(y)
     train.append(line)
     
-np.savetxt("trainingData\example1.txt",train,"%i")
+np.savetxt("example2.txt",train,"%i")
